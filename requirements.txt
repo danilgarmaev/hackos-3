@@ -1,0 +1,5 @@
+langchain-google-genai
+langchain-openai
+langchain-ollama
+transformers
+tqdm
