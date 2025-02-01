@@ -2,20 +2,51 @@ from typing import List, Optional
 import csv
 from transformers import AutoModel, AutoTokenizer
 import torch
-import numpy as np
 
 from .model_class import Model, ModelPrediction, _error_types, _severities
 
 
-class Utils:
+class Benchmark:
+    def __init__(self, model: Optional[Model] = None, dataset_path: Optional[str] = None,
+                 delimiter: str = ","):
+        self.model = model
+        self.dataset_path = dataset_path
+        self.delimiter = delimiter
+
+        # Get metrics:
+        self.metrics = self.model.get_prediction_metrics()
+
+        # Load dataset as a list of ModelPrediction:
+        self.dataset = self.load_dataset(dataset_path, delimiter=self.delimiter)
+
+    @staticmethod
+    def load_dataset(path: str, delimiter=",") -> List[ModelPrediction]:
+        """
+        Loads the dataset (from a CSV file) into a list of ModelPrediction.
+        """
+        _dicts = []
+        with open(path, 'r') as csvfile:
+            rows = csv.DictReader(csvfile, delimiter=delimiter)
+            _dicts = [{k: v for k, v in row.items()} for row in rows]
+        _dataset = [ModelPrediction.from_dict(_dict) for _dict in _dicts]
+        return _dataset
+
+    @staticmethod
+    def load_dicts(path: str, delimiter=",") -> List[dict]:
+        _dicts = []
+        with open(path, 'r') as csvfile:
+            rows = csv.DictReader(csvfile, delimiter=delimiter)
+            _dicts = [{k: v for k, v in row.items()} for row in rows]
+        return _dicts
+
     @staticmethod
     def get_similarity_loss(output: str, label: str) -> float:
         similarity_model = AutoModel.from_pretrained("sentence-transformers/all-mpnet-base-v2")
         tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-mpnet-base-v2")
 
         # Tokenize the input strings
-        inputs1 = tokenizer(output, return_tensors="pt", padding=True, truncation=True)
-        inputs2 = tokenizer(label, return_tensors="pt", padding=True, truncation=True)
+        inputs1 = tokenizer(f"{output}", return_tensors="pt", padding=True, truncation=True)
+        inputs2 = tokenizer(f"{label}", return_tensors="pt", padding=True, truncation=True)
 
         # Generate embeddings for both strings
         with torch.no_grad():
@@ -32,33 +63,9 @@ class Utils:
         similarity_loss = (1 - similarity_score) / 2
         return similarity_loss
 
-
-class Benchmark:
-    def __init__(self, model: Optional[Model] = None, dataset_path: Optional[str] = None):
-        self.model = model
-        self.dataset_path = dataset_path
-
-        # Get metrics:
-        self.metrics = self.model.get_prediction_metrics()
-
-        # Load dataset as a list of ModelPrediction:
-        self.dataset = self.load_dataset(dataset_path)
-
-    @staticmethod
-    def load_dataset(path: str) -> List[ModelPrediction]:
-        """
-        Loads the dataset (from a CSV file) into a list of ModelPrediction.
-        """
-        _dicts = []
-        with open(path, 'r') as csvfile:
-            rows = csv.DictReader(csvfile)
-            _dicts = [{k: v for k, v in row.items()} for row in rows]
-        _dataset = [ModelPrediction.from_dict(_dict) for _dict in _dicts]
-        return _dataset
-
     @staticmethod
     def _get_loss(pred, label, metric: str) -> float:
-        _class_metrics = ["is_error", "error_type", "event_type", "severity"]
+        _class_metrics = ["error_type", "severity"]
         if metric in _class_metrics:
             if metric == "error_type":
                 if pred not in _error_types:
@@ -71,7 +78,7 @@ class Benchmark:
             loss = pred != label
             return loss
         # Otherwise, use semantic similarity function:
-        loss = Utils.get_similarity_loss(pred, label)
+        loss = Benchmark.get_similarity_loss(pred, label)
         return loss
 
     def run_benchmark(self) -> tuple:
@@ -88,7 +95,7 @@ class Benchmark:
         for label in self.dataset:
             # Get prediction:
             label_dict = label.to_dict()
-            print(f"Running prediction on {label.input}")
+            # print(f"Running prediction on {label.input}")
             prediction = self.model.predict(label.input)
             predictions.append(prediction)
 
@@ -101,4 +108,5 @@ class Benchmark:
                 # Add loss:
                 losses[_metric] += _loss
 
-        return losses, predictions
+        data_length = len(predictions)
+        return losses, predictions, data_length

@@ -9,28 +9,24 @@ import json
 #   their corresponding metrics.
 # We cannot properly benchmark your models if they do not produce one of these outputs for
 #   these specific metrics ("error_type" and "severity").
-_error_types = ["runtime", "fatal", "warning", "no_error", "other"]
-_severities = ["normal", "warning", "error", "other"]
+_error_types = ["runtime", "fatal", "warning", "no_error"]
+_severities = ["notice", "warn", "error"]
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 class ModelPrediction(BaseModel):
     input: Optional[str] = Field(description="Input to the model.")
-    is_error: Optional[bool] = Field(description="Whether the line represents an error.")
     error_type: Optional[str] = Field(description="Type of error: see list of categories above.")
-    event_type: Optional[int] = Field(description="Type of event. There are 39 event types.")
     severity: Optional[str] = Field(description="Error severity: see list of categories above.")
-    root_cause: Optional[str] = Field(description="Very brief description of possible cause of the error.")
+    description: Optional[str] = Field(description="Very brief description of possible cause of the error.")
     solution: Optional[str] = Field(description="Very brief outline of solutions to fix the error.")
 
     def to_dict(self) -> dict:
         _dict = {
             "input": self.input,
-            "is_error": self.is_error,
             "error_type": self.error_type,
-            "event_type": self.event_type,
             "severity": self.severity,
-            "root_cause": self.root_cause,
+            "description": self.description,
             "solution": self.solution,
         }
         return _dict
@@ -47,8 +43,8 @@ class Model(ABC):
         Return a list of keys (strings) representing what metrics the model predicts.
         A list of all available metrics is found in the ModelPrediction dataclass.
         """
-        # For example, if your model predicts "is_error" and "error_type", this function would return:
-        #   ["is_error", "error_type"]
+        # For example, if your model predicts "severity" and "error_type", this function would return:
+        #   ["severity", "error_type"]
         pass
 
     @abstractmethod

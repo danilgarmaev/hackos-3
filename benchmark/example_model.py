@@ -19,8 +19,10 @@ class LanguageModelConfig:
 
 
 class GPTOutput(BaseModel):
-    is_error: Optional[bool] = Field(description="Whether the line represents an error.")
     error_type: Optional[str] = Field(description="Type of error: see list of categories above.")
+    severity: Optional[str] = Field(description="Severity of the error: one of ['error', 'warn', 'notice']")
+    description: Optional[str] = Field(description="One-line specific description of the log line.")
+    solution: Optional[str] = Field(description="One-line specific solution to the log line, if error or warning.")
 
 
 class LanguageModel:
@@ -63,26 +65,26 @@ class GPTModel(Model):
         self.model = LanguageModel(config, structured_output=GPTOutput)
 
     def get_prediction_metrics(self):
-        _metrics = ["is_error", "error_type"]
+        _metrics = ["error_type", "severity", "description", "solution"]
         return _metrics
 
     def predict(self, text: str) -> ModelPrediction:
         _prompt = """
-        Given the line from production logs below, identify two things:
-        1. is_error: Whether the log represents an error or is normal, as a boolean value (True or False);
+        Given the line from production logs below, identify these things:
+        1. severity: Severity of the error, must be one of ["notice", "warn", "error"];
         2. error_type: If the log is an error, what type of error it is. Here are your choices:
-            ["normal", "warning", "error", "other"]
+            ["fatal", "runtime", "no_error", "warning"]
             Your response for error_type MUST be one of the above. Pick what fits best.
+        3. description: One-line description of the log line.
+        4. solution: One-line description of solutions, if the log line is an error or warning.
         """
-        _output = self.model.get_structured_response(text)
+        _output = self.model.get_structured_response(f"{_prompt}\n\n{text}")
+        print(_output)
         _pred = ModelPrediction(
             input=text,
-            is_error=_output.is_error,
             error_type=_output.error_type,
-            # Metrics our model is not benchmarked on:
-            event_type=0,  # any integer can go here
-            severity="None",  # any string can go here
-            root_cause="None",  # any string can go here
-            solution="None",  # any string can go here
+            severity=_output.severity,
+            description=_output.description,  # any string can go here
+            solution=_output.solution,  # any string can go here
         )
         return _pred
