@@ -29,7 +29,7 @@ If you want to benchmark your models on the datasets here, feel free to use our 
 
 There's also an example model in `example_model.py` for how you can set up models to work with the pipeline.
 
-If you have any question, feel free to ping Aniket or Laurence. 
+If you have any question, feel free to reach out or ping Aniket (@anixus) or Laurence (@larryl4643) on Discord!
 
 Think about the following metrics while benchmarking:
 * How fast does your model run?
