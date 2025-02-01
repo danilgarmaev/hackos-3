@@ -3,6 +3,7 @@ This is the GitHub repository containing our dataset(s) and benchmarking tools.
 Big shoutout to Rootly for providing their dataset for this hackathon; their repository containing the full dataset can be found here:
 [system-logs-dataset by Rootly](https://github.com/rootlyhq/system-logs-dataset)
 
+
 ## About the Data
 The datasets provided by Rootly are sourced from production-environment system logs. 
 
@@ -21,7 +22,23 @@ Each dataset contains the following metrics:
 Our main task is to improve models' ability and speed to perform tasks on the dataset (in particular, we want to be able to improve their accuracy in 
 reproducing DeepSeek-R1's `description` and `solution` metrics). 
 
+
+## Benchmarking
+To make benchmarking models more straightforward, we've implemented a `Benchmark` class (in `benchmark/benchmark.py`), and a `Model` class (in `benchmark/model_class.py`). 
+If you want to benchmark your models on the datasets here, feel free to use our existing pipeline to do so. 
+
+There's also an example model in `example_model.py` for how you can set up models to work with the pipeline.
+
+If you have any question, feel free to ping Aniket or Laurence. 
+
+Think about the following metrics while benchmarking:
+* How fast does your model run?
+* How small is your model?
+* How accurate is your model?
+
 For comparison, **we ran GPT-4o on a small portion of the dataset**, and it performs poorly on almost all metrics (~40% accuracy) on the actual data. 
+
+
 
 Once again, thank you to Rootly for providing us with our data! 
 
