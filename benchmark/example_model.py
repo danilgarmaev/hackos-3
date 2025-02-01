@@ -84,7 +84,7 @@ class GPTModel(Model):
             input=text,
             error_type=_output.error_type,
             severity=_output.severity,
-            description=_output.description,  # any string can go here
-            solution=_output.solution,  # any string can go here
+            description=_output.description,
+            solution=_output.solution,
         )
         return _pred
