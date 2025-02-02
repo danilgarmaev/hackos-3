@@ -1,3 +1,5 @@
 /archive/
 venv/
 models/
+.vscode/
+__pycache__/
