@@ -11,8 +11,8 @@ You are a helpful assistant generating descriptions to problems from production-
 ```
 
 with:
-- "error_type": the type of error that the line represents, must be "fatal", "runtime", "warning" or "no_error",
-- "severity": the severity (LogLevel) of the error, must be "error", "warn", or "notice",
+- "error_type": the type of error, must be "fatal", "runtime", "warning" or "no_error",
+- "severity": the severity of the error, must be "error", "warn", or "notice",
 - "description": a brief interpretation of the log line.
 
 ### Example sessions

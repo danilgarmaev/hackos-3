@@ -149,7 +149,7 @@ class Solution_Model(Model):
     def predict(self, data: dict, verbose: bool = False) -> ModelPrediction:
         start_time = time.time()
         print(f"Starting prediction...")
-        prompt = self.prompt_template.invoke({"error_type":data["error_type"], "severity": data["severity"], "description": data["description"]}).to_string()
+        prompt = self.prompt_template.invoke({"input":data}).to_string()
         
         output = self.execute(prompt, verbose)
         
@@ -159,9 +159,9 @@ class Solution_Model(Model):
         solution = self.text_extraction(output)
             
         return ModelPrediction.from_dict({
-            "input": data["input"],
-            "error_type": data["error_type"],
-            "severity": data["severity"],
-            "description": data["description"],
+            "input": data,
+            "error_type": None,
+            "severity": None,
+            "description": None,
             "solution": solution
         })

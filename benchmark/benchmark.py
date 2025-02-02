@@ -3,7 +3,7 @@ import csv
 from transformers import AutoModel, AutoTokenizer
 import torch
 
-from .model_class import Model, ModelPrediction, _error_types, _severities
+from benchmark.model import Model, ModelPrediction, _error_types, _severities
 
 
 class Benchmark:
@@ -92,7 +92,7 @@ class Benchmark:
         # Keep track of the predictions:
         predictions = []
 
-        for label in self.dataset:
+        for label in self.dataset[0:5]:
             # Get prediction:
             label_dict = label.to_dict()
             # print(f"Running prediction on {label.input}")

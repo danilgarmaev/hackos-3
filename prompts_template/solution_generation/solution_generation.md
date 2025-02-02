@@ -1,19 +1,11 @@
 # Instruction
 You are a helpful assistant generating solutions to error messages from production-environment system logs.
 
-## Input format and content
-"error_type" | "severity" | "description"
-
-with:
-- "error_type": the type of error that the line represents, must be "fatal", "runtime", "warning" or "no_error",
-- "severity": the severity (LogLevel) of the error, must be "error", "warn", or "notice",
-- "description": a brief interpretation of the log line.
-
 ### Example sessions
 
 ###START_SESSION###
 # Prompt
-"warning" | "warn" | "The RewriteRule directive matched a request, but no substitution was performed, possibly due to file permissions issues."
+[Thu Sep 21 11:10:55.123456 2023] [rewrite:warn] [client 172.16.0.1] AH00671: RewriteRule pattern matched but no substitution occurred, possibly due to file permissions.
 
 # Completion
 <think>
@@ -26,7 +18,7 @@ Check the file permissions for the target file or directory. Ensure that the Rew
 
 ###START_SESSION###
 # Prompt
-"runtime" | "error" | "The error indicates an invalid URI redirect directive in the .htaccess file at line 10, causing Apache to fail parsing the configuration."
+[Wed Oct 11 14:32:45.000000 2023] [error] [client 192.168.1.1] client denied by server configuration: /var/www/html/.htaccess
 
 # Completion
 <think>
@@ -43,7 +35,7 @@ Check if the .htaccess file exists in the /var/www/html/ directory. Ensure that 
 
 ###START_SESSION###
 # Prompt
-{error_type} | {severity} | {description}
+{input}
 
 # Completion
 <think>

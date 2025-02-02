@@ -3,3 +3,4 @@ venv/
 models/
 .vscode/
 __pycache__/
+.env
