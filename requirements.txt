@@ -7,3 +7,6 @@ tqdm
 pandas
 azure-ai-inference
 python-dotenv
+peft
+datasets
+scikit-learn
